@@ -1,39 +1,38 @@
-const cp = require('child_process');
+process.on('unhandledRejection', (reason, p) => {
+  console.error('Unhandled Rejection at:', p, 'reason:', reason);
+  // send entire app down. Process manager will restart it
+  process.exit(1);
+});
 
-const spawn = (command, args = [], options) =>
-  new Promise((resolve, reject) => {
-    const ls = cp.spawn(command, args, options);
-    const res = {
-      ok: '',
-      fail: '',
-    };
-    ls.stdout.on('data', data => {
-      res.ok = data.toString();
-    });
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const routes = require('./routes');
+const { PORT } = require('./constants');
 
-    ls.stderr.on('data', data => {
-      res.fail = data.toString();
-    });
+const app = express();
 
-    ls.on('close', code => {
-      if (code === 0) {
-        resolve(res.ok);
-      } else {
-        reject(
-          new Error(
-            [`${command} ${args.join(' ')}(${code})`, res.fail].join('\n')
-          )
-        );
-      }
-    });
-  });
+app.set('trust proxy', true);
 
-// const getDevices = async () => {
-//   const res = await spawn('adb', ['devices']);
-// };
+app.get('/', (req, res) => {
+  fs.createReadStream(path.resolve(__dirname, 'public', 'index.html')).pipe(
+    res
+  );
+});
 
-const main = async () => {
-  await spawn('adb', ['devices']);
-};
+app.use(express.static(path.resolve(__dirname, 'public')));
 
-main().catch(console.error);
+app.use(
+  '/',
+  cors({
+    origin: '*',
+  }),
+  routes
+);
+
+app.listen(PORT, () => {
+  console.info(
+    `You can now view in the browser. \n\n http://localhost:${PORT} \n`
+  );
+});

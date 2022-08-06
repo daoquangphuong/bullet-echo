@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Bullet Echo</title>
+    <style>
+      .button {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+      <br />
+      <button class="button" onclick="capture()">Capture</button>
+      <br />
+      <div>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+    <script>
+      const getImage = async src => {
+        return new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = function() {
+            resolve(image);
+          };
+          image.src = src;
+          image.onerror = function(e) {
+            reject(e);
+          };
+        });
+      };
+      const findPos = obj => {
+        let curLeft = 0;
+        let curTop = 0;
+        if (obj.offsetParent) {
+          do {
+            curLeft += obj.offsetLeft;
+            curTop += obj.offsetTop;
+          } while ((obj = obj.offsetParent));
+          return { x: curLeft, y: curTop };
+        }
+        return undefined;
+      };
+      const rgbToHex = (r, g, b) => {
+        if (r > 255 || g > 255 || b > 255) throw 'Invalid color component';
+        return ((r << 16) | (g << 8) | b).toString(16);
+      };
+
+      const capture = async () => {
+        const response = await fetch('post/capture', {
+          method: 'POST',
+        });
+        const data = await response.json();
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const image = await getImage(
+          `data:image/png;base64, ${data.data.base64}`
+        );
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        ctx.drawImage(image, 0, 0);
+        canvas.onmousedown = function(e) {
+          const pos = findPos(this);
+          const x = e.pageX - pos.x;
+          const y = e.pageY - pos.y;
+          const coord = `[${x}, ${y}]`;
+          const c = this.getContext('2d');
+          const p = c.getImageData(x, y, 1, 1).data;
+          const hex = '#' + ('000000' + rgbToHex(p[0], p[1], p[2])).slice(-6);
+          console.info(coord + `, // ${hex}\n`);
+        };
+      };
+    </script>
+  </body>
+</html>
