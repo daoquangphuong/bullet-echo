@@ -86,7 +86,7 @@ const DONE = [[[99, 50]], [[7, 19, 61]]];
 
 const PLAY_BUTTON = [1328, 659];
 
-const GO_AHEAD = [...[202, 522], ...[203, 0]];
+const GO_AHEAD = [...[202, 522], ...[202, 0]];
 
 const BOMB_BUTTON = [1231, 391];
 
@@ -96,7 +96,6 @@ const COLLECT_BUTTON = [746, 625];
 
 const main = async () => {
   const lastState = {};
-  const state = {};
 
   const loop = async () => {
     const next = (time = 0) => {
@@ -151,14 +150,8 @@ const main = async () => {
       if (isBombReady) {
         await adb.inputTap(...BOMB_BUTTON);
       }
-      if (!isBombReady && !state.swipe) {
-        state.swipe = true;
-        adb
-          .inputSwipe(...GO_AHEAD, 1000)
-          .then(() => {
-            state.swipe = false;
-          })
-          .catch(console.error);
+      if (!isBombReady) {
+        await adb.inputSwipe(...GO_AHEAD, 1750);
       }
     }
     next(100);
