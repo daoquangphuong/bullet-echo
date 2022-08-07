@@ -108,6 +108,36 @@ const CONTACT = [
   ],
 ];
 
+const OFFER = [
+  [
+    [1030, 131],
+    [1050, 132],
+    [1030, 155],
+    [1052, 153],
+  ],
+  [
+    [4, 66, 148],
+    [4, 66, 148],
+    [4, 66, 148],
+    [4, 66, 148],
+  ],
+];
+
+const FLASH_OFFER = [
+  [
+    [1072, 127],
+    [1091, 126],
+    [1070, 148],
+    [1092, 148],
+  ],
+  [
+    [255, 255, 255],
+    [255, 255, 255],
+    [255, 255, 255],
+    [255, 255, 255],
+  ],
+];
+
 const PLAY_BUTTON = [1328, 659];
 
 const GO_AHEAD = [...[202, 522], ...[202, 0]];
@@ -120,7 +150,13 @@ const RESULT_BUTTON = [125, 665];
 
 const COLLECT_BUTTON = [746, 625];
 
-const CLOSE_1_BUTTON = [1431, 44];
+const CLOSE_CONTACT_BUTTON = [1431, 44];
+
+const CLOSE_OFFER_BUTTON = [1042, 143];
+
+const CLOSE_FLASH_OFFER_BUTTON = [1081, 137];
+
+const YES_FLASH_OFFER_BUTTON = [627, 514];
 
 const main = async () => {
   const lastState = {};
@@ -144,6 +180,8 @@ const main = async () => {
     const isCollect = await adb.colorMatch(buf, ...COLLECT);
     const isDONE = await adb.colorMatch(buf, ...DONE);
     const isContact = await adb.colorMatch(buf, ...CONTACT);
+    const isOffer = await adb.colorMatch(buf, ...OFFER);
+    const isFLashOffer = await adb.colorMatch(buf, ...FLASH_OFFER);
     const newState = {
       isHome,
       isHomeInvite,
@@ -153,6 +191,8 @@ const main = async () => {
       isCollect,
       isDONE,
       isContact,
+      isOffer,
+      isFLashOffer,
     };
     const isStateChanged = Object.keys(newState).some(
       key => newState[key] !== lastState[key]
@@ -193,8 +233,18 @@ const main = async () => {
         await adb.inputSwipe(...GO_AHEAD, 750);
         await adb.inputTap(...BOMB_BUTTON);
       }
-    } else if (isContact) {
-      await adb.inputTap(...CLOSE_1_BUTTON);
+    } else {
+      if (isContact) {
+        await adb.inputTap(...CLOSE_CONTACT_BUTTON);
+      }
+      if (isOffer) {
+        await adb.inputTap(...CLOSE_OFFER_BUTTON);
+      }
+      if (isFLashOffer) {
+        await adb.inputTap(...CLOSE_FLASH_OFFER_BUTTON);
+        await adb.delay(1000);
+        await adb.inputTap(...YES_FLASH_OFFER_BUTTON);
+      }
     }
     next(100);
   };
