@@ -47,12 +47,19 @@ const GAME = [
 
 const BOMB_READY = [
   [
-    [1293, 410],
-    [1283, 427],
+    [1293, 406],
+    [1295, 402],
+    [1296, 399],
   ],
   [
-    [156, 200, 227],
     [156, 201, 228],
+    [156, 201, 228],
+    [156, 201, 228],
+  ],
+  [
+    [99, 128, 145],
+    [99, 128, 145],
+    [99, 128, 145],
   ],
 ];
 
@@ -84,9 +91,26 @@ const COLLECT = [
 
 const DONE = [[[99, 50]], [[7, 19, 61]]];
 
+const CONTACT = [
+  [
+    [1422, 34],
+    [1440, 33],
+    [1421, 54],
+    [1441, 54],
+  ],
+  [
+    [10, 140, 237],
+    [10, 140, 237],
+    [10, 140, 237],
+    [10, 140, 237],
+  ],
+];
+
 const PLAY_BUTTON = [1328, 659];
 
 const GO_AHEAD = [...[202, 522], ...[202, 0]];
+
+const TURN_AROUND = [...[900, 500], ...[1400, 500]];
 
 const BOMB_BUTTON = [1231, 391];
 
@@ -94,8 +118,14 @@ const RESULT_BUTTON = [125, 665];
 
 const COLLECT_BUTTON = [746, 625];
 
+const CLOSE_1_BUTTON = [1431, 44];
+
 const main = async () => {
   const lastState = {};
+  const state = {
+    moved: false,
+    turned: false,
+  };
 
   const loop = async () => {
     const next = (time = 0) => {
@@ -111,6 +141,7 @@ const main = async () => {
     const isResult = await adb.colorMatch(buf, ...RESULT);
     const isCollect = await adb.colorMatch(buf, ...COLLECT);
     const isDONE = await adb.colorMatch(buf, ...DONE);
+    const isContact = await adb.colorMatch(buf, ...CONTACT);
     const newState = {
       isHome,
       isHomeInvite,
@@ -119,6 +150,7 @@ const main = async () => {
       isResult,
       isCollect,
       isDONE,
+      isContact,
     };
     const isStateChanged = Object.keys(newState).some(
       key => newState[key] !== lastState[key]
@@ -128,6 +160,8 @@ const main = async () => {
       Object.assign(lastState, newState);
     }
     if (isHome) {
+      state.moved = false;
+      state.turned = false;
       if (isDONE) {
         console.info('DONE');
         return;
@@ -149,10 +183,17 @@ const main = async () => {
     if (isGame) {
       if (isBombReady) {
         await adb.inputTap(...BOMB_BUTTON);
+        await adb.delay(500);
+      } else {
+        if (!state.turned) {
+          state.turned = true;
+          await adb.inputSwipe(...TURN_AROUND, 300);
+        }
+        await adb.inputSwipe(...GO_AHEAD, 750);
+        await adb.inputTap(...BOMB_BUTTON);
       }
-      if (!isBombReady) {
-        await adb.inputSwipe(...GO_AHEAD, 1750);
-      }
+    } else if (isContact) {
+      await adb.inputTap(...CLOSE_1_BUTTON);
     }
     next(100);
   };
