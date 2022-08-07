@@ -34,13 +34,15 @@ const HOME_INVITE = [
 
 const GAME = [
   [
-    [231, 28],
-    [231, 35],
-    [231, 43],
+    [1078, 629],
+    [1096, 619],
+    [1088, 644],
+    [1105, 641],
   ],
   [
     [156, 201, 228],
-    [153, 195, 221],
+    [156, 201, 228],
+    [156, 201, 228],
     [156, 201, 228],
   ],
 ];
@@ -183,7 +185,6 @@ const main = async () => {
     if (isGame) {
       if (isBombReady) {
         await adb.inputTap(...BOMB_BUTTON);
-        await adb.delay(500);
       } else {
         if (!state.turned) {
           state.turned = true;
