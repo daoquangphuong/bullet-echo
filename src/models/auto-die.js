@@ -170,6 +170,23 @@ const WARNING = [
   ],
 ];
 
+const HERO = [
+  [
+    [1414, 48],
+    [1426, 40],
+    [1437, 47],
+    [1416, 60],
+    [1436, 60],
+  ],
+  [
+    [10, 140, 237],
+    [10, 140, 237],
+    [10, 140, 237],
+    [10, 140, 237],
+    [10, 140, 237],
+  ],
+];
+
 const PLAY_BUTTON = [1328, 659];
 
 const GO_AHEAD = [...[202, 522], ...[202, 0]];
@@ -193,6 +210,8 @@ const YES_FLASH_OFFER_BUTTON = [627, 514];
 const LEVEL_UP_BUTTON = [934, 631];
 
 const WARNING_BUTTON = [1160, 612];
+
+const HERO_BUTTON = [53, 48];
 
 const main = async () => {
   const lastState = {};
@@ -220,6 +239,7 @@ const main = async () => {
     const isFLashOffer = await adb.colorMatch(buf, ...FLASH_OFFER);
     const isLevelUp = await adb.colorMatch(buf, ...LEVEL_UP);
     const isWarning = await adb.colorMatch(buf, ...WARNING);
+    const isHero = await adb.colorMatch(buf, ...HERO);
     const newState = {
       isHome,
       isHomeInvite,
@@ -233,6 +253,7 @@ const main = async () => {
       isFLashOffer,
       isLevelUp,
       isWarning,
+      isHero,
     };
     const isStateChanged = Object.keys(newState).some(
       key => newState[key] !== lastState[key]
@@ -290,6 +311,9 @@ const main = async () => {
       }
       if (isWarning) {
         await adb.inputTap(...WARNING_BUTTON);
+      }
+      if (isHero) {
+        await adb.inputTap(...HERO_BUTTON);
       }
     }
     next(100);
