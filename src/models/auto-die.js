@@ -153,6 +153,23 @@ const LEVEL_UP = [
   ],
 ];
 
+const WARNING = [
+  [
+    [1152, 603],
+    [1152, 620],
+    [1164, 612],
+    [1172, 602],
+    [1173, 620],
+  ],
+  [
+    [73, 158, 189],
+    [73, 158, 189],
+    [73, 158, 189],
+    [73, 158, 189],
+    [73, 158, 189],
+  ],
+];
+
 const PLAY_BUTTON = [1328, 659];
 
 const GO_AHEAD = [...[202, 522], ...[202, 0]];
@@ -174,6 +191,8 @@ const CLOSE_FLASH_OFFER_BUTTON = [1081, 137];
 const YES_FLASH_OFFER_BUTTON = [627, 514];
 
 const LEVEL_UP_BUTTON = [934, 631];
+
+const WARNING_BUTTON = [1160, 612];
 
 const main = async () => {
   const lastState = {};
@@ -200,6 +219,7 @@ const main = async () => {
     const isOffer = await adb.colorMatch(buf, ...OFFER);
     const isFLashOffer = await adb.colorMatch(buf, ...FLASH_OFFER);
     const isLevelUp = await adb.colorMatch(buf, ...LEVEL_UP);
+    const isWarning = await adb.colorMatch(buf, ...WARNING);
     const newState = {
       isHome,
       isHomeInvite,
@@ -211,6 +231,8 @@ const main = async () => {
       isContact,
       isOffer,
       isFLashOffer,
+      isLevelUp,
+      isWarning,
     };
     const isStateChanged = Object.keys(newState).some(
       key => newState[key] !== lastState[key]
@@ -265,6 +287,9 @@ const main = async () => {
       }
       if (isLevelUp) {
         await adb.inputTap(...LEVEL_UP_BUTTON);
+      }
+      if (isWarning) {
+        await adb.inputTap(...WARNING_BUTTON);
       }
     }
     next(100);
