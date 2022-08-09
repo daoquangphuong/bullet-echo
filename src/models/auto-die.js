@@ -47,24 +47,6 @@ const GAME = [
   ],
 ];
 
-const BOMB_READY = [
-  [
-    [1293, 406],
-    [1295, 402],
-    [1296, 399],
-  ],
-  [
-    [156, 201, 228],
-    [156, 201, 228],
-    [156, 201, 228],
-  ],
-  [
-    [99, 128, 145],
-    [99, 128, 145],
-    [99, 128, 145],
-  ],
-];
-
 const RESULT = [
   [
     [50, 645],
@@ -170,6 +152,23 @@ const WARNING = [
   ],
 ];
 
+const WARNING_2 = [
+  [
+    [1061, 611],
+    [1072, 611],
+    [1079, 612],
+    [1088, 620],
+    [1088, 603],
+  ],
+  [
+    [73, 158, 189],
+    [73, 158, 189],
+    [73, 158, 189],
+    [73, 158, 189],
+    [73, 158, 189],
+  ],
+];
+
 const HERO = [
   [
     [1414, 48],
@@ -211,6 +210,8 @@ const LEVEL_UP_BUTTON = [934, 631];
 
 const WARNING_BUTTON = [1160, 612];
 
+const WARNING_BUTTON_2 = [1076, 611];
+
 const HERO_BUTTON = [53, 48];
 
 const main = async () => {
@@ -218,6 +219,7 @@ const main = async () => {
   const state = {
     moved: false,
     turned: false,
+    gameAt: false,
   };
 
   const loop = async () => {
@@ -230,7 +232,6 @@ const main = async () => {
     const isHome = await adb.colorMatch(buf, ...HOME);
     const isHomeInvite = await adb.colorMatch(buf, ...HOME_INVITE);
     const isGame = await adb.colorMatch(buf, ...GAME);
-    const isBombReady = await adb.colorMatch(buf, ...BOMB_READY);
     const isResult = await adb.colorMatch(buf, ...RESULT);
     const isCollect = await adb.colorMatch(buf, ...COLLECT);
     const isDONE = await adb.colorMatch(buf, ...DONE);
@@ -239,12 +240,12 @@ const main = async () => {
     const isFLashOffer = await adb.colorMatch(buf, ...FLASH_OFFER);
     const isLevelUp = await adb.colorMatch(buf, ...LEVEL_UP);
     const isWarning = await adb.colorMatch(buf, ...WARNING);
+    const isWarning2 = await adb.colorMatch(buf, ...WARNING_2);
     const isHero = await adb.colorMatch(buf, ...HERO);
     const newState = {
       isHome,
       isHomeInvite,
       isGame,
-      isBombReady,
       isResult,
       isCollect,
       isDONE,
@@ -253,6 +254,7 @@ const main = async () => {
       isFLashOffer,
       isLevelUp,
       isWarning,
+      isWarning2,
       isHero,
     };
     const isStateChanged = Object.keys(newState).some(
@@ -265,6 +267,7 @@ const main = async () => {
     if (isHome) {
       state.moved = false;
       state.turned = false;
+      state.gameAt = false;
       if (isDONE) {
         console.info('DONE');
         return;
@@ -284,14 +287,14 @@ const main = async () => {
       return;
     }
     if (isGame) {
-      if (isBombReady) {
-        await adb.inputTap(...BOMB_BUTTON);
-      } else {
-        if (!state.turned) {
-          state.turned = true;
-          await adb.inputSwipe(...TURN_AROUND, 300);
-        }
-        await adb.inputSwipe(...GO_AHEAD, 750);
+      state.gameAt = state.gameAt || Date.now();
+
+      if (!state.turned) {
+        state.turned = true;
+        await adb.inputSwipe(...TURN_AROUND, 300);
+      }
+      await adb.inputSwipe(...GO_AHEAD, 750);
+      if (Date.now() - state.gameAt > 5000) {
         await adb.inputTap(...BOMB_BUTTON);
       }
     } else {
@@ -311,6 +314,9 @@ const main = async () => {
       }
       if (isWarning) {
         await adb.inputTap(...WARNING_BUTTON);
+      }
+      if (isWarning2) {
+        await adb.inputTap(...WARNING_BUTTON_2);
       }
       if (isHero) {
         await adb.inputTap(...HERO_BUTTON);
