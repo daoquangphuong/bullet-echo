@@ -13,7 +13,7 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <br />
-      <button class="button" onclick="capture()">Capture</button>
+      <button class="button" onclick="capture().catch(console.error)">Capture</button>
       <br />
       <div>
         <canvas id="canvas"></canvas>
