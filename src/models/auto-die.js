@@ -135,6 +135,21 @@ const LEVEL_UP = [
   ],
 ];
 
+const SAVE = [
+  [
+    [468, 510],
+    [699, 510],
+    [465, 568],
+    [705, 571],
+  ],
+  [
+    [237, 71, 34],
+    [235, 68, 30],
+    [234, 67, 29],
+    [233, 65, 26],
+  ],
+];
+
 const WARNING = [
   [
     [1152, 603],
@@ -208,6 +223,8 @@ const YES_FLASH_OFFER_BUTTON = [627, 514];
 
 const LEVEL_UP_BUTTON = [934, 631];
 
+const DONE_SAVE_BUTTON = [592, 537];
+
 const WARNING_BUTTON = [1160, 612];
 
 const WARNING_BUTTON_2 = [1076, 611];
@@ -239,6 +256,7 @@ const main = async () => {
     const isOffer = await adb.colorMatch(buf, ...OFFER);
     const isFLashOffer = await adb.colorMatch(buf, ...FLASH_OFFER);
     const isLevelUp = await adb.colorMatch(buf, ...LEVEL_UP);
+    const isSave = await adb.colorMatch(buf, ...SAVE);
     const isWarning = await adb.colorMatch(buf, ...WARNING);
     const isWarning2 = await adb.colorMatch(buf, ...WARNING_2);
     const isHero = await adb.colorMatch(buf, ...HERO);
@@ -253,6 +271,7 @@ const main = async () => {
       isOffer,
       isFLashOffer,
       isLevelUp,
+      isSave,
       isWarning,
       isWarning2,
       isHero,
@@ -294,7 +313,7 @@ const main = async () => {
         await adb.inputSwipe(...TURN_AROUND, 300);
       }
       await adb.inputSwipe(...GO_AHEAD, 750);
-      if (Date.now() - state.gameAt > 5000) {
+      if (Date.now() - state.gameAt > 4000) {
         await adb.inputTap(...BOMB_BUTTON);
       }
     } else {
@@ -311,6 +330,9 @@ const main = async () => {
       }
       if (isLevelUp) {
         await adb.inputTap(...LEVEL_UP_BUTTON);
+      }
+      if (isSave) {
+        await adb.inputTap(...DONE_SAVE_BUTTON);
       }
       if (isWarning) {
         await adb.inputTap(...WARNING_BUTTON);
