@@ -3,10 +3,11 @@ const adb = require('./adb');
 const main = async () => {
   const buf = await adb.screenCapture();
   const input = [
-    [1505, 309], // #044294
-    [1531, 310], // #044294
-    [1501, 341], // #044294
-    [1533, 340], // #044294
+    [2306, 72], // #0a8ced
+    [2321, 61], // #0a8ced
+    [2335, 75], // #0a8ced
+    [2336, 88], // #0a8ced
+    [2305, 92], // #0a8ced
   ];
   const { points } = await adb.getPixelColor(buf, input);
   console.info(input, ',');
