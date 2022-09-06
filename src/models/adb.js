@@ -81,8 +81,11 @@ const getDevices = async () => {
 
 const getWindowSize = async () => {
   const res = await spawn('adb', ['shell', 'wm', 'size']);
-  const [physical, override] = res.split('\n');
+  const lines = res.split('\n');
   const size = item => {
+    if (!item) {
+      return null;
+    }
     const [width, height] = item
       .split(':')[1]
       .split('x')
@@ -92,10 +95,12 @@ const getWindowSize = async () => {
       height: Math.min(width, height),
     };
   };
-  return {
-    physical: size(physical),
-    override: size(override),
+  const result = {
+    physical: size(lines[0]),
+    override: size(lines[1]),
   };
+  result.size = result.override || result.physical;
+  return result;
 };
 
 const getEvents = async onData => {

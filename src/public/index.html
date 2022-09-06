@@ -6,6 +6,8 @@
     <style>
       .button {
         cursor: pointer;
+        height: 50px;
+        font-size: 24px;
       }
     </style>
   </head>
@@ -13,7 +15,12 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <br />
-      <button class="button" onclick="capture().catch(console.error)">Capture</button>
+      <button class="button" onclick="capture().catch(console.error)">
+        Capture
+      </button>
+      <button class="button" onclick="clearStore().catch(console.error)">
+        Clear
+      </button>
       <br />
       <div>
         <canvas id="canvas"></canvas>
@@ -49,6 +56,10 @@
         return ((r << 16) | (g << 8) | b).toString(16);
       };
 
+      const store = {
+        lines: [],
+      };
+
       const capture = async () => {
         const response = await fetch('post/capture', {
           method: 'POST',
@@ -70,8 +81,14 @@
           const c = this.getContext('2d');
           const p = c.getImageData(x, y, 1, 1).data;
           const hex = '#' + ('000000' + rgbToHex(p[0], p[1], p[2])).slice(-6);
-          console.info(coord + `, // ${hex}\n`);
+          store.lines.push(coord + `, // ${hex}`);
+          console.info(store.lines.join('\n'));
         };
+      };
+
+      const clearStore = async () => {
+        console.clear();
+        store.lines = [];
       };
     </script>
   </body>
