@@ -113,7 +113,7 @@ const main = async () => {
         await adb.inputSwipe(...TURN_AROUND, 300);
       }
       await adb.inputSwipe(...GO_AHEAD, 750);
-      if (Date.now() - state.gameAt > 2800) {
+      if (Date.now() - state.gameAt > 3000) {
         await adb.inputTap(...BOMB_BUTTON);
       }
     } else {
