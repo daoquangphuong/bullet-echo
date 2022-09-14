@@ -14,6 +14,7 @@ const {
   WARNING,
   WARNING_2,
   HERO,
+  DENY_INVITE_BUTTON,
   PLAY_BUTTON,
   GO_AHEAD,
   TURN_AROUND,
@@ -82,6 +83,11 @@ const main = async () => {
     if (isStateChanged) {
       console.info(newState);
       Object.assign(lastState, newState);
+    }
+    if (isHomeInvite) {
+      await adb.inputTap(...DENY_INVITE_BUTTON);
+      next(100);
+      return;
     }
     if (isHome) {
       state.moved = false;
