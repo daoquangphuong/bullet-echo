@@ -31,17 +31,7 @@ app.use(
 );
 
 app.listen(config.port, () => {
-  if (process.env.NODE_ENV !== 'production') {
-    console.info(
-      `You can now view bullet-echo-server in the browser. \n\n http://localhost:${config.port} \n`
-    );
-    return;
-  }
   console.info(
-    `
----------------------------------------------------------
-[      Bullet-Echo-Server is now running.       ]
----------------------------------------------------------
-  `
+    `You can now view bullet-echo-server in the browser. \n\n http://localhost:${config.port} \n`
   );
 });
