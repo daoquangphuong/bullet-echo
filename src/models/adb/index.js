@@ -1,5 +1,5 @@
 const cp = require('child_process');
-const { KEY_EVENT } = require('../constants');
+const { KEY_EVENT } = require('../../constants');
 
 const config = {
   sdk: 25,

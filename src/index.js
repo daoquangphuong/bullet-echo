@@ -4,35 +4,25 @@ process.on('unhandledRejection', (reason, p) => {
   process.exit(1);
 });
 
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
-const cors = require('cors');
-const routes = require('./routes');
-const { PORT } = require('./constants');
+const { Worker } = require('worker_threads');
+const config = require('./config');
+const update = require('./update');
 
-const app = express();
+const main = async () => {
+  await update.check();
+  const worker = new Worker(config.serverFile);
+  worker.on('message', data => {
+    if (data && data.event === 'update') {
+      worker.terminate();
+      main().catch(console.error);
+    }
+  });
+  worker.on('error', console.error);
+  worker.on('exit', code => {
+    if (code !== 0) {
+      console.error(`Worker stopped with exit code ${code}`);
+    }
+  });
+};
 
-app.set('trust proxy', true);
-
-app.get('/', (req, res) => {
-  fs.createReadStream(path.resolve(__dirname, 'public', 'index.html')).pipe(
-    res
-  );
-});
-
-app.use(express.static(path.resolve(__dirname, 'public')));
-
-app.use(
-  '/',
-  cors({
-    origin: '*',
-  }),
-  routes
-);
-
-app.listen(PORT, () => {
-  console.info(
-    `You can now view in the browser. \n\n http://localhost:${PORT} \n`
-  );
-});
+main().catch(console.error);

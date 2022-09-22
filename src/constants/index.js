@@ -1,5 +1,3 @@
-const PORT = 4483;
-
 const KEY_EVENT = {
   ACTION_DOWN: 'ACTION_DOWN',
   ACTION_MULTIPLE: 'ACTION_MULTIPLE',
@@ -346,6 +344,5 @@ const KEY_EVENT = {
 };
 
 module.exports = {
-  PORT,
   KEY_EVENT,
 };

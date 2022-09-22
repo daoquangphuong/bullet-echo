@@ -1,4 +1,4 @@
-const adb = require('./adb');
+const adb = require('../../adb');
 const {
   HOME,
   HOME_INVITE,
@@ -30,9 +30,10 @@ const {
   WARNING_BUTTON,
   WARNING_BUTTON_2,
   HERO_BUTTON,
-} = require('./auto-die.json');
+} = require('./data.json');
 
 const main = async () => {
+  let ended = false;
   const lastState = {};
   const state = {
     moved: false,
@@ -41,6 +42,9 @@ const main = async () => {
   };
 
   const loop = async () => {
+    if (ended) {
+      return;
+    }
     const next = (time = 0) => {
       setTimeout(() => {
         loop().catch(console.error);
@@ -153,6 +157,11 @@ const main = async () => {
     next(100);
   };
   loop().catch(console.error);
+
+  return async () => {
+    ended = true;
+    return new Promise(resolve => setTimeout(resolve, 1000));
+  };
 };
 
-main().catch(console.error);
+module.exports = main;
