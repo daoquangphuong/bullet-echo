@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const fsExtra = require('fs-extra');
 const { axiosFetch } = require('./models/axios');
 const config = require('./config');
 
@@ -27,22 +28,41 @@ const getCurrentVersion = async () => {
 };
 
 const getGitFolder = async () => {
-  const { data } = await axiosFetch({
-    url: `${GIT_ENDPOINT}`,
-    method: 'GET',
-    responseType: 'text',
-    transformResponse: [res => res],
+  const folders = [''];
+  const fileList = [];
+
+  return new Promise((resolve, reject) => {
+    const loop = async () => {
+      const folder = folders.shift();
+      if (folder === undefined) {
+        resolve(fileList);
+        return;
+      }
+      const { data } = await axiosFetch({
+        url: `${GIT_ENDPOINT}${folder}`,
+        method: 'GET',
+        responseType: 'text',
+        transformResponse: [res => res],
+      });
+      const fileMatches = data.match(
+        /"\/daoquangphuong\/bullet-echo\/(tree|blob)\/master\/dest\/(.+?)"/g
+      );
+      fileMatches.forEach(item => {
+        const match = item.match(
+          /"\/daoquangphuong\/bullet-echo\/(tree|blob)\/master\/dest\/(.+?)"/
+        );
+        const fileInfo = { isDir: match[1] === 'tree', value: match[2] };
+        if (fileInfo.isDir) {
+          folders.push(`/${fileInfo.value}`);
+        } else {
+          fileList.push(fileInfo.value);
+        }
+      });
+      loop().catch(reject);
+    };
+
+    loop().catch(reject);
   });
-  const fileMatches = data.match(
-    /"\/daoquangphuong\/bullet-echo\/blob\/master\/dest\/(.+?)"/g
-  );
-  const files = fileMatches.map(item => {
-    const match = item.match(
-      /"\/daoquangphuong\/bullet-echo\/blob\/master\/dest\/(.+?)"/
-    );
-    return match[1];
-  });
-  return files;
 };
 
 const getGitFile = async filePath => {
@@ -69,6 +89,11 @@ const getNextVersion = async () => {
 
 const updateFile = async fileName => {
   const fileContent = await getGitFile(fileName);
+  const pathList = fileName.split('/');
+  pathList.pop();
+  if (pathList.length) {
+    await fsExtra.ensureDir(path.resolve(ROOT, pathList.join('/')));
+  }
   fs.writeFileSync(path.resolve(ROOT, fileName), fileContent, 'utf8');
 };
 
