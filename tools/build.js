@@ -38,6 +38,7 @@ const webpackConfig = {
   },
   entry: {
     index: path.resolve(serverPath, 'index.js'),
+    server: path.resolve(serverPath, 'server.js'),
   },
   output: {
     filename: '[name].js',
