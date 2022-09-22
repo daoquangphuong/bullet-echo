@@ -15,6 +15,18 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
       <br />
+      <button
+        class="button"
+        onclick="autoDie({state: 'start'}).catch(console.error)"
+      >
+        Start Die
+      </button>
+      <button
+        class="button"
+        onclick="autoDie({state: 'stop'}).catch(console.error)"
+      >
+        Stop Die
+      </button>
       <button class="button" onclick="capture().catch(console.error)">
         Capture
       </button>
@@ -58,6 +70,15 @@
 
       const store = {
         lines: [],
+      };
+
+      const autoDie = async params => {
+        await fetch('post/auto-die?a=true', {
+          method: 'POST',
+          body: JSON.stringify({
+            body: params,
+          }),
+        });
       };
 
       const capture = async () => {

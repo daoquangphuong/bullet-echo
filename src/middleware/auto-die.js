@@ -8,7 +8,7 @@ module.exports = async function capture(req, res, next) {
     const schema = joi.object().keys({
       state: joi
         .string()
-        .allow(['start', 'stop'])
+        .valid(...['start', 'stop'])
         .required(),
     });
 

@@ -5,6 +5,7 @@ const ping = require('../middleware/ping');
 const error = require('../middleware/error');
 const json = require('../middleware/json');
 const capture = require('../middleware/capture');
+const autoDie = require('../middleware/auto-die');
 
 const router = express.Router();
 
@@ -23,6 +24,8 @@ router.use(bodyParser.json());
 router.use(json('after'));
 
 router.post('/post/capture', capture);
+
+router.post('/post/auto-die', autoDie);
 
 // error handler
 router.use(error);
